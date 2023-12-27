@@ -6,6 +6,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Tags\Tags;
 
 use AltDesign\AltSeo\Helpers\Data;
+use Statamic\Assets\AssetRepository;
 
 /**
  * Class AltSeo
@@ -181,18 +182,19 @@ class AltSeo extends Tags
     {
         $imageURL = '';
         if (!empty($this->context->value('alt_seo_social_image'))) {
-            $imageURL =  str_replace('/assets/', '', Antlers::parse($this->context->value('alt_seo_social_image')));
+            $imageURL = str_replace('/assets/', '', Antlers::parse($this->context->value('alt_seo_social_image')));
         } else {
             $data = new Data('settings');
+
             if ($data->get('alt_seo_social_image_default')) {
-                $image = $data->get('alt_seo_social_image_default');
-                $imageURL = str_replace('/assets/', '', $image);
+                $path = $data->get('alt_seo_social_image_default');
+                $image = (new AssetRepository)->all()->filter(function ($asset) use ($path) {
+                    return $asset->path() === $path;
+                })->first();
+                $imageURL = Antlers::parse($image);
             }
         }
 
-        if (!empty($imageURL)) {
-            $imageURL = ENV('APP_URL') . '/assets/' . $imageURL;
-        }
         return $imageURL;
     }
 
