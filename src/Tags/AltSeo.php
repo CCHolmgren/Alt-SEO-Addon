@@ -48,7 +48,7 @@ class AltSeo extends Tags
         $returnString = '<title>' . $this->getTitle() . '</title>';
         $returnString .= '<meta name="description" content="' . strip_tags($this->getDescription()) . '" />';
         $returnString .= '<!-- Facebook Meta Tags -->';
-        $returnString .= '<meta property="og:url" content="' . ENV('APP_URL') . '">';
+        $returnString .= '<meta property="og:url" content="' . $this->getCurrentUrl() . '">';
         $returnString .= '<meta property="og:type" content="website">';
         $returnString .= '<meta property="og:title" content="' . $this->getSocialTitle() . '">';
         $returnString .= '<meta property="og:description" content="' . strip_tags($this->getSocialDescription()) . '">';
@@ -56,10 +56,10 @@ class AltSeo extends Tags
         $returnString .= '<!-- Twitter Meta Tags -->';
         $returnString .= '<meta name="twitter:card" content="summary_large_image">';
         $returnString .= '<meta property="twitter:domain" content="' . ENV('APP_URL') . '">';
-        $returnString .= '<meta property="twitter:url" content="' . ENV('APP_URL') . '">';
+        $returnString .= '<meta property="twitter:url" content="' . $this->getCurrentUrl() . '">';
         $returnString .= '<meta name="twitter:title" content="' . $this->getSocialTitle() . '">';
         $returnString .= '<meta name="twitter:description" content="' . strip_tags($this->getSocialDescription()) . '">';
-        $returnString .= '<meta property="twitter:image" content="' . $this->getSocialImage() .'">';
+        $returnString .= '<meta property="twitter:image" content="' . $this->getSocialImage() . '">';
 
         return $returnString;
     }
@@ -70,7 +70,8 @@ class AltSeo extends Tags
      * @param $string
      * @return array|string|string[]
      */
-    public function replaceVars($string){
+    public function replaceVars($string)
+    {
         $blueprintPageTitle = $this->context->value('title'); // Page Title
         $appName = $this->context->value('config.app.name'); // App Name
         $string = str_replace('{title}', $blueprintPageTitle, $string);
@@ -85,12 +86,12 @@ class AltSeo extends Tags
      */
     public function getTitle()
     {
-        if(!empty($this->context->value('alt_seo_meta_title'))) {
+        if (!empty($this->context->value('alt_seo_meta_title'))) {
             return $this->replaceVars($this->context->value('alt_seo_meta_title'));
         }
 
         $data = new Data('settings');
-        if($data->get('alt_seo_meta_title_default')) {
+        if ($data->get('alt_seo_meta_title_default')) {
             $title = $data->get('alt_seo_meta_title_default');
             return $this->replaceVars($title);
         }
@@ -105,12 +106,12 @@ class AltSeo extends Tags
      */
     public function getDescription()
     {
-        if(!empty($this->context->value('alt_seo_meta_description'))) {
+        if (!empty($this->context->value('alt_seo_meta_description'))) {
             return Antlers::parse($this->replaceVars($this->context->value('alt_seo_meta_description')));
         }
 
         $data = new Data('settings');
-        if($data->get('alt_seo_meta_description_default')) {
+        if ($data->get('alt_seo_meta_description_default')) {
             $description = $data->get('alt_seo_meta_description_default');
             $description = $this->replaceVars($description);
             return Antlers::parse($description);
@@ -126,12 +127,12 @@ class AltSeo extends Tags
      */
     public function getSocialTitle()
     {
-        if(!empty($this->context->value('alt_seo_social_title'))) {
+        if (!empty($this->context->value('alt_seo_social_title'))) {
             return $this->replaceVars($this->context->value('alt_seo_social_title'));
         }
 
         $data = new Data('settings');
-        if($data->get('alt_seo_social_title_default')) {
+        if ($data->get('alt_seo_social_title_default')) {
             $title = $data->get('alt_seo_social_title_default');
             return $this->replaceVars($title);
         }
@@ -149,11 +150,11 @@ class AltSeo extends Tags
 
         $socialDescription = '';
 
-        if(!empty($this->context->value('alt_seo_social_description'))) {
+        if (!empty($this->context->value('alt_seo_social_description'))) {
             $socialDescription = Antlers::parse($this->replaceVars($this->context->value('alt_seo_social_description')));
         } else {
             $data = new Data('settings');
-            if($data->get('alt_seo_social_description_default')) {
+            if ($data->get('alt_seo_social_description_default')) {
                 $description = $data->get('alt_seo_social_description_default');
                 $description = $this->replaceVars($description);
                 $description = Antlers::parse($description);
@@ -179,19 +180,24 @@ class AltSeo extends Tags
     public function getSocialImage()
     {
         $imageURL = '';
-        if(!empty($this->context->value('alt_seo_social_image'))) {
+        if (!empty($this->context->value('alt_seo_social_image'))) {
             $imageURL =  str_replace('/assets/', '', Antlers::parse($this->context->value('alt_seo_social_image')));
         } else {
             $data = new Data('settings');
-            if($data->get('alt_seo_social_image_default')) {
+            if ($data->get('alt_seo_social_image_default')) {
                 $image = $data->get('alt_seo_social_image_default');
                 $imageURL = str_replace('/assets/', '', $image);
             }
         }
 
-        if(!empty($imageURL)) {
+        if (!empty($imageURL)) {
             $imageURL = ENV('APP_URL') . '/assets/' . $imageURL;
         }
         return $imageURL;
+    }
+
+    public function getCurrentUrl()
+    {
+        return $this->context->get('current_full_url');
     }
 }
