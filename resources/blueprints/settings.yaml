@@ -116,7 +116,7 @@ sections:
       - handle: alt_seo_social_image_default
         field:
           mode: list
-          container: assets
+          container: public_files
           restrict: false
           allow_uploads: true
           show_filename: true
