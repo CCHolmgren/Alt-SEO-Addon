@@ -191,7 +191,7 @@ class AltSeo extends Tags
                 $image = (new AssetRepository)->all()->filter(function ($asset) use ($path) {
                     return $asset->path() === $path;
                 })->first();
-                $imageURL = Antlers::parse($image);
+                $imageURL = $image ? Antlers::parse($image) : null;
             }
         }
 
